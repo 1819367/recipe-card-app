@@ -1,7 +1,5 @@
-import time
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-import click
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recipes.db'
@@ -21,6 +19,22 @@ class Recipe(db.Model):
 with app.app_context():
     db.create_all()
     db.session.commit()
+
+@app.route('/api/recipes', methods=['GET'])
+def get_all_recipes():
+    recipes = Recipe.query.all()
+    recipe_list = []
+    for recipe in recipes:
+        recipe_list.append({
+            'id': recipe.id,
+            'title': recipe.title,
+            'ingredients': recipe.ingredients,
+            'instructions': recipe.instructions,
+            'description': recipe.description,
+            'image_url': recipe.image_url,
+            'servings': recipe.servings
+        })
+    return jsonify(recipe_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
